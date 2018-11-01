@@ -28,11 +28,10 @@ typedef void (^AspectEventBlock)(id<JKUBSAspectInfo> aspectInfo);
         if (trackArr) {
             for (NSDictionary *event in trackArr) {
                 
-                SEL selecor;
                 AspectEventBlock buttonBlock = event[@"block"];
                 BOOL isClassMethod = [event[@"isClassMethod"] boolValue];
                 NSString *method = event[@"EventSelectorName"];
-                selecor = NSSelectorFromString(method);
+                SEL selecor = NSSelectorFromString(method);
                 [self trackTouchEventWithClass:clazz selector:selecor block:buttonBlock isClassMethod:isClassMethod];
             }
         }

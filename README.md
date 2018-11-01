@@ -24,7 +24,7 @@ pod 'MDAspects'
 
 ## Author
 
-iyongjie@yeah.net, yj.li@muheda.com
+iyongjie@yeah.net
 
 ## License
 

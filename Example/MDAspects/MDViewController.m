@@ -7,7 +7,7 @@
 //
 
 #import "MDViewController.h"
-
+#import "JKUBSAspects.h"
 @interface MDViewController ()
 
 @end
@@ -21,20 +21,26 @@
     UIButton *btn = [UIButton buttonWithType:UIButtonTypeCustom];
     [btn setTitle:@"捕获实例方法" forState:UIControlStateNormal];
     [btn setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
-    [btn setFrame:CGRectMake(100, 100, 100, 30)];
+    [btn setFrame:CGRectMake(100, 100, 130, 30)];
     [btn addTarget:self action:@selector(instanceMethod) forControlEvents:UIControlEventTouchUpInside];
     [self.view addSubview:btn];
 
     UIButton *btn1 = [UIButton buttonWithType:UIButtonTypeCustom];
     [btn1 setTitle:@"捕获类方法" forState:UIControlStateNormal];
     [btn1 setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
-    [btn1 setFrame:CGRectMake(100, 200, 100, 30)];
+    [btn1 setFrame:CGRectMake(100, 200, 130, 30)];
     [btn1 addTarget:self action:@selector(clickAction) forControlEvents:UIControlEventTouchUpInside];
     [self.view addSubview:btn1];
 
 
+    
+    
+    
 }
-
+-(void)viewWillAppear:(BOOL)animated{
+    [super viewWillAppear:animated];
+    
+}
 -(void)instanceMethod{
     NSLog(@"实例方法执行了");
 }
