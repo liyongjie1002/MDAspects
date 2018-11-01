@@ -1,0 +1,6 @@
+framework module MDAspects {
+  umbrella header "MDAspects-umbrella.h"
+
+  export *
+  module * { export * }
+}

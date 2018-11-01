@@ -1,0 +1,16 @@
+PODS:
+  - MDAspects (1.0.0)
+
+DEPENDENCIES:
+  - MDAspects (from `../`)
+
+EXTERNAL SOURCES:
+  MDAspects:
+    :path: "../"
+
+SPEC CHECKSUMS:
+  MDAspects: 07746566b302b20ac4cb8a4e98b95f454b37b88d
+
+PODFILE CHECKSUM: 8fd104254d0ee838e5cae63045a020a48328382c
+
+COCOAPODS: 1.5.3

@@ -1,0 +1,6 @@
+framework module Pods_MDAspects_Example {
+  umbrella header "Pods-MDAspects_Example-umbrella.h"
+
+  export *
+  module * { export * }
+}
