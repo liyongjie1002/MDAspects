@@ -9,5 +9,5 @@
 @import UIKit;
 
 @interface MDViewController : UIViewController
-+(void)hookclassMethod;
++(void)hookClassMethod;
 @end

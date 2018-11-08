@@ -8,6 +8,8 @@
 
 #import "MDAOPManager.h"
 #import "MDAOPManager+MDViewController.h"
+#import "MDAOPManager+MDSecViewController.h"
+
 
 typedef void (^AspectEventBlock)(id<JKUBSAspectInfo> aspectInfo);
 
@@ -16,6 +18,7 @@ typedef void (^AspectEventBlock)(id<JKUBSAspectInfo> aspectInfo);
 +(void)load{
     NSMutableDictionary *mutableDic = [NSMutableDictionary dictionary];
     [mutableDic addEntriesFromDictionary:[MDAOPManager AOP_MDViewControllerConfigDic]];
+    [mutableDic addEntriesFromDictionary:[MDAOPManager AOP_MDSecViewControllerConfigDic]];
     [self configAOPWithDic:mutableDic];
     
 }
@@ -29,30 +32,30 @@ typedef void (^AspectEventBlock)(id<JKUBSAspectInfo> aspectInfo);
             for (NSDictionary *event in trackArr) {
                 
                 AspectEventBlock buttonBlock = event[@"block"];
-                BOOL isClassMethod = [event[@"isClassMethod"] boolValue];
                 NSString *method = event[@"EventSelectorName"];
-                SEL selecor = NSSelectorFromString(method);
-                [self trackTouchEventWithClass:clazz selector:selecor block:buttonBlock isClassMethod:isClassMethod];
+                SEL selector = NSSelectorFromString(method);
+
+                if ([method hasPrefix:@"+"]) {//hook类方法
+                    method = [method substringFromIndex:1];
+                    selector = NSSelectorFromString(method);
+
+                    [clazz aspect_hookClassSelector:selector withOptions:JKUBSAspectPositionAfter usingBlock:^(id<JKUBSAspectInfo> aspectInfo) {
+                        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+                            buttonBlock(aspectInfo);
+                        });
+                    } error:NULL];
+                }else{//hook实例方法
+                    
+                    [clazz aspect_hookSelector:selector withOptions:JKUBSAspectPositionAfter usingBlock:^(id<JKUBSAspectInfo> aspectInfo) {
+                        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+                            buttonBlock(aspectInfo);
+                        });
+                    } error:NULL];
+                }
+
             }
         }
     }
 }
-
-+ (void)trackTouchEventWithClass:(Class)class selector:(SEL)selector block:(AspectEventBlock)block isClassMethod:(BOOL)isClassMethod{
-    if (isClassMethod) {
-        [class aspect_hookClassSelector:selector withOptions:JKUBSAspectPositionAfter usingBlock:^(id<JKUBSAspectInfo> aspectInfo) {
-            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-                block(aspectInfo);
-            });
-        } error:NULL];
-    }else{
-        [class aspect_hookSelector:selector withOptions:JKUBSAspectPositionAfter usingBlock:^(id<JKUBSAspectInfo> aspectInfo) {
-            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-                block(aspectInfo);
-            });
-        } error:NULL];
-    }
-} 
-
 
 @end

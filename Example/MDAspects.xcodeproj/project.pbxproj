@@ -26,6 +26,8 @@
 		873B8AEB1B1F5CCA007FD442 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 873B8AEA1B1F5CCA007FD442 /* Main.storyboard */; };
 		B723BE0F218B100C00249E0A /* MDAOPManager.m in Sources */ = {isa = PBXBuildFile; fileRef = B723BE08218B100C00249E0A /* MDAOPManager.m */; };
 		B723BE14218B113E00249E0A /* MDAOPManager+MDViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B723BE13218B113E00249E0A /* MDAOPManager+MDViewController.m */; };
+		D452B085219496B80046B0F1 /* MDSecViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D452B084219496B80046B0F1 /* MDSecViewController.m */; };
+		D452B088219496D90046B0F1 /* MDAOPManager+MDSecViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D452B087219496D90046B0F1 /* MDAOPManager+MDSecViewController.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -71,6 +73,10 @@
 		B723BE0B218B100C00249E0A /* MDAOPManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MDAOPManager.h; sourceTree = "<group>"; };
 		B723BE12218B113E00249E0A /* MDAOPManager+MDViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "MDAOPManager+MDViewController.h"; sourceTree = "<group>"; };
 		B723BE13218B113E00249E0A /* MDAOPManager+MDViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "MDAOPManager+MDViewController.m"; sourceTree = "<group>"; };
+		D452B083219496B80046B0F1 /* MDSecViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MDSecViewController.h; sourceTree = "<group>"; };
+		D452B084219496B80046B0F1 /* MDSecViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MDSecViewController.m; sourceTree = "<group>"; };
+		D452B086219496D90046B0F1 /* MDAOPManager+MDSecViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "MDAOPManager+MDSecViewController.h"; sourceTree = "<group>"; };
+		D452B087219496D90046B0F1 /* MDAOPManager+MDSecViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "MDAOPManager+MDSecViewController.m"; sourceTree = "<group>"; };
 		DE96C1F7BFBEC80D92D146DD /* Pods_MDAspects_Example.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_MDAspects_Example.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		E55F1B40F37F75CD220CA7F2 /* Pods-MDAspects_Tests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MDAspects_Tests.release.xcconfig"; path = "Pods/Target Support Files/Pods-MDAspects_Tests/Pods-MDAspects_Tests.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -144,6 +150,8 @@
 				873B8AEA1B1F5CCA007FD442 /* Main.storyboard */,
 				6003F5A5195388D20070C39A /* MDViewController.h */,
 				6003F5A6195388D20070C39A /* MDViewController.m */,
+				D452B083219496B80046B0F1 /* MDSecViewController.h */,
+				D452B084219496B80046B0F1 /* MDSecViewController.m */,
 				71719F9D1E33DC2100824A3D /* LaunchScreen.storyboard */,
 				6003F5A8195388D20070C39A /* Images.xcassets */,
 				6003F594195388D20070C39A /* Supporting Files */,
@@ -210,6 +218,8 @@
 				B723BE08218B100C00249E0A /* MDAOPManager.m */,
 				B723BE12218B113E00249E0A /* MDAOPManager+MDViewController.h */,
 				B723BE13218B113E00249E0A /* MDAOPManager+MDViewController.m */,
+				D452B086219496D90046B0F1 /* MDAOPManager+MDSecViewController.h */,
+				D452B087219496D90046B0F1 /* MDAOPManager+MDSecViewController.m */,
 			);
 			path = MDAOPManager;
 			sourceTree = "<group>";
@@ -376,6 +386,8 @@
 				B723BE0F218B100C00249E0A /* MDAOPManager.m in Sources */,
 				6003F59E195388D20070C39A /* MDAppDelegate.m in Sources */,
 				6003F5A7195388D20070C39A /* MDViewController.m in Sources */,
+				D452B088219496D90046B0F1 /* MDAOPManager+MDSecViewController.m in Sources */,
+				D452B085219496B80046B0F1 /* MDSecViewController.m in Sources */,
 				6003F59A195388D20070C39A /* main.m in Sources */,
 				B723BE14218B113E00249E0A /* MDAOPManager+MDViewController.m in Sources */,
 			);
