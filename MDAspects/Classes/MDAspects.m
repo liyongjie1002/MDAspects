@@ -5,29 +5,29 @@
 //  Copyright (c) 2014 Peter Steinberger. Licensed under the MIT license.
 //
 
-#import "JKUBSAspects.h"
+#import "MDAspects.h"
 #import <libkern/OSAtomic.h>
 #import <objc/runtime.h>
 #import <objc/message.h>
 
-#define JKUBSAspectLog(...)
+#define MDAspectLog(...)
 //#define AspectLog(...) do { NSLog(__VA_ARGS__); }while(0)
-#define JKUBSAspectLogError(...) do { NSLog(__VA_ARGS__); }while(0)
+#define MDAspectLogError(...) do { NSLog(__VA_ARGS__); }while(0)
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored"-Wvisibility"
 #pragma clang diagnostic ignored"-Wblock-capture-autoreleasing"
 
 // Block internals.
-typedef NS_OPTIONS(int, JKUBSAspectBlockFlags) {
-	JKUBSAspectBlockFlagsHasCopyDisposeHelpers = (1 << 25),
-	JKUBSAspectBlockFlagsHasSignature          = (1 << 30)
+typedef NS_OPTIONS(int, MDAspectBlockFlags) {
+	MDAspectBlockFlagsHasCopyDisposeHelpers = (1 << 25),
+	MDAspectBlockFlagsHasSignature          = (1 << 30)
 };
 typedef struct _AspectBlock {
 	__unused Class isa;
-	JKUBSAspectBlockFlags flags;
+	MDAspectBlockFlags flags;
 	__unused int reserved;
-	void (__unused *invoke)(struct _JKUBSAspectBlock *block, ...);
+	void (__unused *invoke)(struct _MDAspectBlock *block, ...);
 	struct {
 		unsigned long int reserved;
 		unsigned long int size;
@@ -39,9 +39,9 @@ typedef struct _AspectBlock {
 		const char *layout;
 	} *descriptor;
 	// imported variables
-} *JKUBSAspectBlockRef;
+} *MDAspectBlockRef;
 
-@interface JKUBSAspectInfo : NSObject <JKUBSAspectInfo>
+@interface MDAspectInfo : NSObject <MDAspectInfo>
 - (id)initWithInstance:(__unsafe_unretained id)instance invocation:(NSInvocation *)invocation;
 @property (nonatomic, unsafe_unretained, readonly) id instance;
 @property (nonatomic, strong, readonly) NSArray *arguments;
@@ -49,19 +49,19 @@ typedef struct _AspectBlock {
 @end
 
 // Tracks a single aspect.
-@interface JKUBSAspectIdentifier : NSObject
-+ (instancetype)identifierWithSelector:(SEL)selector isHookClassMethod:(BOOL)isHookClassMethod object:(id)object options:(JKUBSAspectOptions)options block:(id)block error:(NSError **)error;
-- (BOOL)invokeWithInfo:(id<JKUBSAspectInfo>)info;
+@interface MDAspectIdentifier : NSObject
++ (instancetype)identifierWithSelector:(SEL)selector isHookClassMethod:(BOOL)isHookClassMethod object:(id)object options:(MDAspectOptions)options block:(id)block error:(NSError **)error;
+- (BOOL)invokeWithInfo:(id<MDAspectInfo>)info;
 @property (nonatomic, assign) SEL selector;
 @property (nonatomic, strong) id block;
 @property (nonatomic, strong) NSMethodSignature *blockSignature;
 @property (nonatomic, weak) id object;
-@property (nonatomic, assign) JKUBSAspectOptions options;
+@property (nonatomic, assign) MDAspectOptions options;
 @end
 
 // Tracks all aspects for an object/class.
-@interface JKUBSAspectsContainer : NSObject
-- (void)addAspect:(JKUBSAspectIdentifier *)aspect withOptions:(JKUBSAspectOptions)injectPosition;
+@interface MDAspectsContainer : NSObject
+- (void)addAspect:(MDAspectIdentifier *)aspect withOptions:(MDAspectOptions)injectPosition;
 - (BOOL)removeAspect:(id)aspect;
 - (BOOL)hasAspects;
 @property (atomic, copy) NSArray *beforeAspects;
@@ -69,7 +69,7 @@ typedef struct _AspectBlock {
 @property (atomic, copy) NSArray *afterAspects;
 @end
 
-@interface JKUBSAspectTracker : NSObject
+@interface MDAspectTracker : NSObject
 - (id)initWithTrackedClass:(Class)trackedClass;
 @property (nonatomic, strong) Class trackedClass;
 @property (nonatomic, strong) NSMutableSet *selectorNames;
@@ -79,56 +79,56 @@ typedef struct _AspectBlock {
 - (NSArray *)aspects_arguments;
 @end
 
-#define JKUBSAspectPositionFilter 0x07
+#define MDAspectPositionFilter 0x07
 
-#define JKUBSAspectError(errorCode, errorDescription) do { \
-JKUBSAspectLogError(@"Aspects: %@", errorDescription); \
-if (error) { *error = [NSError errorWithDomain:JKUBSAspectErrorDomain code:errorCode userInfo:@{NSLocalizedDescriptionKey: errorDescription}]; }}while(0)
+#define MDAspectError(errorCode, errorDescription) do { \
+MDAspectLogError(@"Aspects: %@", errorDescription); \
+if (error) { *error = [NSError errorWithDomain:MDAspectErrorDomain code:errorCode userInfo:@{NSLocalizedDescriptionKey: errorDescription}]; }}while(0)
 
-NSString *const JKUBSAspectErrorDomain = @"JKUBSAspectErrorDomain";
-static NSString *const JKUBSAspectsSubclassSuffix = @"_JKUBSAspects_";
-static NSString *const JKUBSAspectsMessagePrefix = @"JKUBSaspects_";
+NSString *const MDAspectErrorDomain = @"MDAspectErrorDomain";
+static NSString *const MDAspectsSubclassSuffix = @"_MDAspects_";
+static NSString *const MDAspectsMessagePrefix = @"MDAspects_";
 
-@implementation NSObject (JKUBSAspects)
+@implementation NSObject (MDAspects)
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 #pragma mark - Public Aspects API
 
-+ (id<JKUBSAspectToken>)aspect_hookSelector:(SEL)selector
-                      withOptions:(JKUBSAspectOptions)options
++ (id<MDAspectToken>)aspect_hookSelector:(SEL)selector
+                      withOptions:(MDAspectOptions)options
                        usingBlock:(id)block
                             error:(NSError **)error {
     return aspect_add((id)self, selector, NO, options, block, error);
 }
 
 /// @return A token which allows to later deregister the aspect.
-- (id<JKUBSAspectToken>)aspect_hookSelector:(SEL)selector
-                      withOptions:(JKUBSAspectOptions)options
+- (id<MDAspectToken>)aspect_hookSelector:(SEL)selector
+                      withOptions:(MDAspectOptions)options
                        usingBlock:(id)block
                             error:(NSError **)error {
     return aspect_add(self, selector, NO, options, block, error);
 }
 
-+ (id<JKUBSAspectToken>)aspect_hookClassSelector:(SEL)selector withOptions:(JKUBSAspectOptions)options usingBlock:(id)block error:(NSError *__autoreleasing *)error{
++ (id<MDAspectToken>)aspect_hookClassSelector:(SEL)selector withOptions:(MDAspectOptions)options usingBlock:(id)block error:(NSError *__autoreleasing *)error{
     return aspect_add((id)self, selector, YES, options, block, error);
 }
 
-- (id<JKUBSAspectToken>)aspect_hookClassSelector:(SEL)selector withOptions:(JKUBSAspectOptions)options usingBlock:(id)block error:(NSError *__autoreleasing *)error{
+- (id<MDAspectToken>)aspect_hookClassSelector:(SEL)selector withOptions:(MDAspectOptions)options usingBlock:(id)block error:(NSError *__autoreleasing *)error{
     return aspect_add(self, selector, YES, options, block, error);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 #pragma mark - Private Helper
 
-static id aspect_add(id self, SEL selector, BOOL isHookClassMethod,JKUBSAspectOptions options, id block, NSError **error) {
+static id aspect_add(id self, SEL selector, BOOL isHookClassMethod,MDAspectOptions options, id block, NSError **error) {
     NSCParameterAssert(self);
     NSCParameterAssert(selector);
     NSCParameterAssert(block);
-    __block JKUBSAspectIdentifier *identifier = nil;
+    __block MDAspectIdentifier *identifier = nil;
     aspect_performLocked(^{
         if (aspect_isSelectorAllowedAndTrack(self, isHookClassMethod, selector, options, error)) {
-            JKUBSAspectsContainer *aspectContainer = aspect_getContainerForObject(self, selector);
-            identifier = [JKUBSAspectIdentifier identifierWithSelector:selector isHookClassMethod:isHookClassMethod object:self options:options block:block error:error];
+            MDAspectsContainer *aspectContainer = aspect_getContainerForObject(self, selector);
+            identifier = [MDAspectIdentifier identifierWithSelector:selector isHookClassMethod:isHookClassMethod object:self options:options block:block error:error];
             if (identifier) {
                 [aspectContainer addAspect:identifier withOptions:options];
                 
@@ -140,14 +140,14 @@ static id aspect_add(id self, SEL selector, BOOL isHookClassMethod,JKUBSAspectOp
     return identifier;
 }
 
-static BOOL aspect_remove(JKUBSAspectIdentifier *aspect, NSError **error) {
-    NSCAssert([aspect isKindOfClass:JKUBSAspectIdentifier.class], @"Must have correct type.");
+static BOOL aspect_remove(MDAspectIdentifier *aspect, NSError **error) {
+    NSCAssert([aspect isKindOfClass:MDAspectIdentifier.class], @"Must have correct type.");
 
     __block BOOL success = NO;
     aspect_performLocked(^{
         id self = aspect.object; // strongify
         if (self) {
-            JKUBSAspectsContainer *aspectContainer = aspect_getContainerForObject(self, aspect.selector);
+            MDAspectsContainer *aspectContainer = aspect_getContainerForObject(self, aspect.selector);
             success = [aspectContainer removeAspect:aspect];
 
             aspect_cleanupHookedClassAndSelector(self, aspect.selector);
@@ -157,7 +157,7 @@ static BOOL aspect_remove(JKUBSAspectIdentifier *aspect, NSError **error) {
             aspect.selector = NULL;
         }else {
             NSString *errrorDesc = [NSString stringWithFormat:@"Unable to deregister hook. Object already deallocated: %@", aspect];
-            JKUBSAspectError(JKUBSAspectErrorRemoveObjectAlreadyDeallocated, errrorDesc);
+            MDAspectError(MDAspectErrorRemoveObjectAlreadyDeallocated, errrorDesc);
         }
     });
     return success;
@@ -172,24 +172,24 @@ static void aspect_performLocked(dispatch_block_t block) {
 
 static SEL aspect_aliasForSelector(SEL selector) {
     NSCParameterAssert(selector);
-	return NSSelectorFromString([JKUBSAspectsMessagePrefix stringByAppendingFormat:@"_%@", NSStringFromSelector(selector)]);
+	return NSSelectorFromString([MDAspectsMessagePrefix stringByAppendingFormat:@"_%@", NSStringFromSelector(selector)]);
 }
 
 static NSMethodSignature *aspect_blockMethodSignature(id block, NSError **error) {
-    JKUBSAspectBlockRef layout = (__bridge void *)block;
-	if (!(layout->flags & JKUBSAspectBlockFlagsHasSignature)) {
+    MDAspectBlockRef layout = (__bridge void *)block;
+	if (!(layout->flags & MDAspectBlockFlagsHasSignature)) {
         NSString *description = [NSString stringWithFormat:@"The block %@ doesn't contain a type signature.", block];
-        JKUBSAspectError(JKUBSAspectErrorMissingBlockSignature, description);
+        MDAspectError(MDAspectErrorMissingBlockSignature, description);
         return nil;
     }
 	void *desc = layout->descriptor;
 	desc += 2 * sizeof(unsigned long int);
-	if (layout->flags & JKUBSAspectBlockFlagsHasCopyDisposeHelpers) {
+	if (layout->flags & MDAspectBlockFlagsHasCopyDisposeHelpers) {
 		desc += 2 * sizeof(void *);
     }
 	if (!desc) {
         NSString *description = [NSString stringWithFormat:@"The block %@ doesn't has a type signature.", block];
-        JKUBSAspectError(JKUBSAspectErrorMissingBlockSignature, description);
+        MDAspectError(MDAspectErrorMissingBlockSignature, description);
         return nil;
     }
 	const char *signature = (*(const char **)desc);
@@ -230,7 +230,7 @@ static BOOL aspect_isCompatibleBlockSignature(NSMethodSignature *blockSignature,
     
         if (![object respondsToSelector:selector]) {
             NSString *description = [NSString stringWithFormat:@"Blog signature %@ doesn't match %@.", blockSignature, methodSignature];
-            JKUBSAspectError(JKUBSAspectErrorIncompatibleBlockSignature, description);
+            MDAspectError(MDAspectErrorIncompatibleBlockSignature, description);
             return NO;
         }else{
             return isHookClassMethod;
@@ -299,7 +299,7 @@ static void aspect_prepareClassAndHookSelector(NSObject *self, SEL selector, BOO
 
         // We use forwardInvocation to hook in.
         class_replaceMethod(klass, selector, aspect_getMsgForwardIMP(self, isHookClassMethod, selector), typeEncoding);
-        JKUBSAspectLog(@"Aspects: Installed hook for -[%@ %@].", klass, NSStringFromSelector(selector));
+        MDAspectLog(@"Aspects: Installed hook for -[%@ %@].", klass, NSStringFromSelector(selector));
     }
 }
 
@@ -326,25 +326,25 @@ static void aspect_cleanupHookedClassAndSelector(NSObject *self, SEL selector) {
         NSCAssert(originalMethod, @"Original implementation for %@ not found %@ on %@", NSStringFromSelector(selector), NSStringFromSelector(aliasSelector), klass);
 
         class_replaceMethod(klass, selector, originalIMP, typeEncoding);
-        JKUBSAspectLog(@"Aspects: Removed hook for -[%@ %@].", klass, NSStringFromSelector(selector));
+        MDAspectLog(@"Aspects: Removed hook for -[%@ %@].", klass, NSStringFromSelector(selector));
     }
 
     // Deregister global tracked selector
     aspect_deregisterTrackedSelector(self, selector);
 
     // Get the aspect container and check if there are any hooks remaining. Clean up if there are not.
-    JKUBSAspectsContainer *container = aspect_getContainerForObject(self, selector);
+    MDAspectsContainer *container = aspect_getContainerForObject(self, selector);
     if (!container.hasAspects) {
         // Destroy the container
         aspect_destroyContainerForObject(self, selector);
 
         // Figure out how the class was modified to undo the changes.
         NSString *className = NSStringFromClass(klass);
-        if ([className hasSuffix:JKUBSAspectsSubclassSuffix]) {
-            Class originalClass = NSClassFromString([className stringByReplacingOccurrencesOfString:JKUBSAspectsSubclassSuffix withString:@""]);
+        if ([className hasSuffix:MDAspectsSubclassSuffix]) {
+            Class originalClass = NSClassFromString([className stringByReplacingOccurrencesOfString:MDAspectsSubclassSuffix withString:@""]);
             NSCAssert(originalClass != nil, @"Original class must exist");
             object_setClass(self, originalClass);
-            JKUBSAspectLog(@"JKUBSAspects: %@ has been restored.", NSStringFromClass(originalClass));
+            MDAspectLog(@"MDAspects: %@ has been restored.", NSStringFromClass(originalClass));
 
             // We can only dispose the class pair if we can ensure that no instances exist using our subclass.
             // Since we don't globally track this, we can't ensure this - but there's also not much overhead in keeping it around.
@@ -368,7 +368,7 @@ static Class aspect_hookClass(NSObject *self, BOOL isHookClassMethod, NSError **
 	NSString *className = NSStringFromClass(baseClass);
 
     // Already subclassed
-	if ([className hasSuffix:JKUBSAspectsSubclassSuffix]) {
+	if ([className hasSuffix:MDAspectsSubclassSuffix]) {
 		return baseClass;
 
         // We swizzle a class object, not a single object.
@@ -384,14 +384,14 @@ static Class aspect_hookClass(NSObject *self, BOOL isHookClassMethod, NSError **
     }
 
     // Default case. Create dynamic subclass.
-	const char *subclassName = [className stringByAppendingString:JKUBSAspectsSubclassSuffix].UTF8String;
+	const char *subclassName = [className stringByAppendingString:MDAspectsSubclassSuffix].UTF8String;
 	Class subclass = objc_getClass(subclassName);
 
 	if (subclass == nil) {
 		subclass = objc_allocateClassPair(baseClass, subclassName, 0);
 		if (subclass == nil) {
             NSString *errrorDesc = [NSString stringWithFormat:@"objc_allocateClassPair failed to allocate class %s.", subclassName];
-            JKUBSAspectError(JKUBSAspectErrorFailedToAllocateClassPair, errrorDesc);
+            MDAspectError(MDAspectErrorFailedToAllocateClassPair, errrorDesc);
             return nil;
         }
 
@@ -405,26 +405,26 @@ static Class aspect_hookClass(NSObject *self, BOOL isHookClassMethod, NSError **
 	return subclass;
 }
 
-static NSString *const JKUBSAspectsForwardInvocationSelectorName = @"__JKUBSaspects_forwardInvocation:";
+static NSString *const MDAspectsForwardInvocationSelectorName = @"__MDAspects_forwardInvocation:";
 static void aspect_swizzleForwardInvocation(Class klass) {
     NSCParameterAssert(klass);
     // If there is no method, replace will act like class_addMethod.
-    IMP originalImplementation = class_replaceMethod(klass, @selector(forwardInvocation:), (IMP)__JKUBSASPECTS_ARE_BEING_CALLED__, "v@:@");
+    IMP originalImplementation = class_replaceMethod(klass, @selector(forwardInvocation:), (IMP)__MDAspects_ARE_BEING_CALLED__, "v@:@");
     if (originalImplementation) {
-        class_addMethod(klass, NSSelectorFromString(JKUBSAspectsForwardInvocationSelectorName), originalImplementation, "v@:@");
+        class_addMethod(klass, NSSelectorFromString(MDAspectsForwardInvocationSelectorName), originalImplementation, "v@:@");
     }
-    JKUBSAspectLog(@"Aspects: %@ is now aspect aware.", NSStringFromClass(klass));
+    MDAspectLog(@"Aspects: %@ is now aspect aware.", NSStringFromClass(klass));
 }
 
 static void aspect_undoSwizzleForwardInvocation(Class klass) {
     NSCParameterAssert(klass);
-    Method originalMethod = class_getInstanceMethod(klass, NSSelectorFromString(JKUBSAspectsForwardInvocationSelectorName));
+    Method originalMethod = class_getInstanceMethod(klass, NSSelectorFromString(MDAspectsForwardInvocationSelectorName));
     Method objectMethod = class_getInstanceMethod(NSObject.class, @selector(forwardInvocation:));
     // There is no class_removeMethod, so the best we can do is to retore the original implementation, or use a dummy.
     IMP originalImplementation = method_getImplementation(originalMethod ?: objectMethod);
     class_replaceMethod(klass, @selector(forwardInvocation:), originalImplementation, "v@:@");
 
-    JKUBSAspectLog(@"Aspects: %@ has been restored.", NSStringFromClass(klass));
+    MDAspectLog(@"Aspects: %@ has been restored.", NSStringFromClass(klass));
 }
 
 static void aspect_hookedGetClass(Class class, Class statedClass) {
@@ -477,27 +477,27 @@ static void aspect_undoSwizzleClassInPlace(Class klass) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////
-#pragma mark - JKUBSAspect Invoke Point
+#pragma mark - MDAspect Invoke Point
 
 // This is a macro so we get a cleaner stack trace.
 #define aspect_invoke(aspects, info) \
-for (JKUBSAspectIdentifier *aspect in aspects) {\
+for (MDAspectIdentifier *aspect in aspects) {\
     [aspect invokeWithInfo:info];\
-    if (aspect.options & JKUBSAspectOptionAutomaticRemoval) { \
+    if (aspect.options & MDAspectOptionAutomaticRemoval) { \
         aspectsToRemove = [aspectsToRemove?:@[] arrayByAddingObject:aspect]; \
     } \
 }
 
 // This is the swizzled forwardInvocation: method.
-static void __JKUBSASPECTS_ARE_BEING_CALLED__(__unsafe_unretained NSObject *self, SEL selector, NSInvocation *invocation) {
+static void __MDAspects_ARE_BEING_CALLED__(__unsafe_unretained NSObject *self, SEL selector, NSInvocation *invocation) {
     NSCParameterAssert(self);
     NSCParameterAssert(invocation);
     SEL originalSelector = invocation.selector;
 	SEL aliasSelector = aspect_aliasForSelector(invocation.selector);
     invocation.selector = aliasSelector;
-    JKUBSAspectsContainer *objectContainer = objc_getAssociatedObject(self, aliasSelector);
-    JKUBSAspectsContainer *classContainer = aspect_getContainerForClass(object_getClass(self), aliasSelector);
-    JKUBSAspectInfo *info = [[JKUBSAspectInfo alloc] initWithInstance:self invocation:invocation];
+    MDAspectsContainer *objectContainer = objc_getAssociatedObject(self, aliasSelector);
+    MDAspectsContainer *classContainer = aspect_getContainerForClass(object_getClass(self), aliasSelector);
+    MDAspectInfo *info = [[MDAspectInfo alloc] initWithInstance:self invocation:invocation];
     NSArray *aspectsToRemove = nil;
 
     // Before hooks.
@@ -526,7 +526,7 @@ static void __JKUBSASPECTS_ARE_BEING_CALLED__(__unsafe_unretained NSObject *self
     // If no hooks are installed, call original implementation (usually to throw an exception)
     if (!respondsToAlias) {
         invocation.selector = originalSelector;
-        SEL originalForwardInvocationSEL = NSSelectorFromString(JKUBSAspectsForwardInvocationSelectorName);
+        SEL originalForwardInvocationSEL = NSSelectorFromString(MDAspectsForwardInvocationSelectorName);
         if ([self respondsToSelector:originalForwardInvocationSEL]) {
             ((void( *)(id, SEL, NSInvocation *))objc_msgSend)(self, originalForwardInvocationSEL, invocation);
         }else {
@@ -543,20 +543,20 @@ static void __JKUBSASPECTS_ARE_BEING_CALLED__(__unsafe_unretained NSObject *self
 #pragma mark - Aspect Container Management
 
 // Loads or creates the aspect container.
-static JKUBSAspectsContainer *aspect_getContainerForObject(NSObject *self, SEL selector) {
+static MDAspectsContainer *aspect_getContainerForObject(NSObject *self, SEL selector) {
     NSCParameterAssert(self);
     SEL aliasSelector = aspect_aliasForSelector(selector);
-    JKUBSAspectsContainer *aspectContainer = objc_getAssociatedObject(self, aliasSelector);
+    MDAspectsContainer *aspectContainer = objc_getAssociatedObject(self, aliasSelector);
     if (!aspectContainer) {
-        aspectContainer = [JKUBSAspectsContainer new];
+        aspectContainer = [MDAspectsContainer new];
         objc_setAssociatedObject(self, aliasSelector, aspectContainer, OBJC_ASSOCIATION_RETAIN);
     }
     return aspectContainer;
 }
 
-static JKUBSAspectsContainer *aspect_getContainerForClass(Class klass, SEL selector) {
+static MDAspectsContainer *aspect_getContainerForClass(Class klass, SEL selector) {
     NSCParameterAssert(klass);
-    JKUBSAspectsContainer *classContainer = nil;
+    MDAspectsContainer *classContainer = nil;
     do {
         classContainer = objc_getAssociatedObject(klass, selector);
         if (classContainer.hasAspects) break;
@@ -583,7 +583,7 @@ static NSMutableDictionary *aspect_getSwizzledClassesDict() {
     return swizzledClassesDict;
 }
 
-static BOOL aspect_isSelectorAllowedAndTrack(NSObject *self, BOOL isHookClassMethod, SEL selector, JKUBSAspectOptions options, NSError **error) {
+static BOOL aspect_isSelectorAllowedAndTrack(NSObject *self, BOOL isHookClassMethod, SEL selector, MDAspectOptions options, NSError **error) {
     static NSSet *disallowedSelectorList;
     static dispatch_once_t pred;
     dispatch_once(&pred, ^{
@@ -594,21 +594,21 @@ static BOOL aspect_isSelectorAllowedAndTrack(NSObject *self, BOOL isHookClassMet
     NSString *selectorName = NSStringFromSelector(selector);
     if ([disallowedSelectorList containsObject:selectorName]) {
         NSString *errorDescription = [NSString stringWithFormat:@"Selector %@ is blacklisted.", selectorName];
-        JKUBSAspectError(JKUBSAspectErrorSelectorBlacklisted, errorDescription);
+        MDAspectError(MDAspectErrorSelectorBlacklisted, errorDescription);
         return NO;
     }
 
     // Additional checks.
-    JKUBSAspectOptions position = options&JKUBSAspectPositionFilter;
-    if ([selectorName isEqualToString:@"dealloc"] && position != JKUBSAspectPositionBefore) {
-        NSString *errorDesc = @"JKUBSAspectPositionBefore is the only valid position when hooking dealloc.";
-        JKUBSAspectError(JKUBSAspectErrorSelectorDeallocPosition, errorDesc);
+    MDAspectOptions position = options&MDAspectPositionFilter;
+    if ([selectorName isEqualToString:@"dealloc"] && position != MDAspectPositionBefore) {
+        NSString *errorDesc = @"MDAspectPositionBefore is the only valid position when hooking dealloc.";
+        MDAspectError(MDAspectErrorSelectorDeallocPosition, errorDesc);
         return NO;
     }
 
     if (![self respondsToSelector:selector] && ![self.class instancesRespondToSelector:selector]) {
         NSString *errorDesc = [NSString stringWithFormat:@"Unable to find selector -[%@ %@].", NSStringFromClass(self.class), selectorName];
-        JKUBSAspectError(JKUBSAspectErrorDoesNotRespondToSelector, errorDesc);
+        MDAspectError(MDAspectErrorDoesNotRespondToSelector, errorDesc);
         return NO;
     }
 
@@ -618,9 +618,9 @@ static BOOL aspect_isSelectorAllowedAndTrack(NSObject *self, BOOL isHookClassMet
         NSMutableDictionary *swizzledClassesDict = aspect_getSwizzledClassesDict();
         Class currentClass = klass;
         do {
-            JKUBSAspectTracker *tracker = swizzledClassesDict[klass];
+            MDAspectTracker *tracker = swizzledClassesDict[klass];
             if (!tracker) {
-             tracker = [[JKUBSAspectTracker alloc] initWithTrackedClass:klass];
+             tracker = [[MDAspectTracker alloc] initWithTrackedClass:klass];
              swizzledClassesDict[(id<NSCopying>)klass] = tracker;
             }
             Method method;
@@ -647,7 +647,7 @@ static void aspect_deregisterTrackedSelector(id self, SEL selector) {
     NSString *selectorName = NSStringFromSelector(selector);
     Class currentClass = [self class];
     do {
-        JKUBSAspectTracker *tracker = swizzledClassesDict[currentClass];
+        MDAspectTracker *tracker = swizzledClassesDict[currentClass];
         if (tracker) {
             [tracker.selectorNames removeObject:selectorName];
             if (tracker.selectorNames.count == 0) {
@@ -659,7 +659,7 @@ static void aspect_deregisterTrackedSelector(id self, SEL selector) {
 
 @end
 
-@implementation JKUBSAspectTracker
+@implementation MDAspectTracker
 
 - (id)initWithTrackedClass:(Class)trackedClass {
     if (self = [super init]) {
@@ -675,9 +675,9 @@ static void aspect_deregisterTrackedSelector(id self, SEL selector) {
 @end
 
 ///////////////////////////////////////////////////////////////////////////////////////////
-#pragma mark - NSInvocation (JKUBSAspects)
+#pragma mark - NSInvocation (MDAspects)
 
-@implementation NSInvocation (JKUBSAspects)
+@implementation NSInvocation (MDAspects)
 
 // Thanks to the ReactiveCocoa team for providing a generic solution for this.
 - (id)aspect_argumentAtIndex:(NSUInteger)index {
@@ -757,10 +757,10 @@ static void aspect_deregisterTrackedSelector(id self, SEL selector) {
 @end
 
 ///////////////////////////////////////////////////////////////////////////////////////////
-#pragma mark - JKUBSAspectIdentifier
+#pragma mark - MDAspectIdentifier
 
-@implementation JKUBSAspectIdentifier
-+ (instancetype)identifierWithSelector:(SEL)selector isHookClassMethod:(BOOL)isHookClassMethod object:(id)object options:(JKUBSAspectOptions)options block:(id)block error:(NSError **)error {
+@implementation MDAspectIdentifier
++ (instancetype)identifierWithSelector:(SEL)selector isHookClassMethod:(BOOL)isHookClassMethod object:(id)object options:(MDAspectOptions)options block:(id)block error:(NSError **)error {
     NSCParameterAssert(block);
     NSCParameterAssert(selector);
     NSMethodSignature *blockSignature = aspect_blockMethodSignature(block, error); // TODO: check signature compatibility, etc.
@@ -768,9 +768,9 @@ static void aspect_deregisterTrackedSelector(id self, SEL selector) {
         return nil;
     }
     
-    JKUBSAspectIdentifier *identifier = nil;
+    MDAspectIdentifier *identifier = nil;
     if (blockSignature) {
-        identifier = [JKUBSAspectIdentifier new];
+        identifier = [MDAspectIdentifier new];
         identifier.selector = selector;
         identifier.block = block;
         identifier.blockSignature = blockSignature;
@@ -785,14 +785,14 @@ static void aspect_deregisterTrackedSelector(id self, SEL selector) {
     return identifier;
 }
 
-- (BOOL)invokeWithInfo:(id<JKUBSAspectInfo>)info {
+- (BOOL)invokeWithInfo:(id<MDAspectInfo>)info {
     NSInvocation *blockInvocation = [NSInvocation invocationWithMethodSignature:self.blockSignature];
     NSInvocation *originalInvocation = info.originalInvocation;
     NSUInteger numberOfArguments = self.blockSignature.numberOfArguments;
 
     // Be extra paranoid. We already check that on hook registration.
     if (numberOfArguments > originalInvocation.methodSignature.numberOfArguments) {
-        JKUBSAspectLogError(@"Block has too many arguments. Not calling %@", info);
+        MDAspectLogError(@"Block has too many arguments. Not calling %@", info);
         return NO;
     }
 
@@ -808,7 +808,7 @@ static void aspect_deregisterTrackedSelector(id self, SEL selector) {
 		NSGetSizeAndAlignment(type, &argSize, NULL);
         
 		if (!(argBuf = reallocf(argBuf, argSize))) {
-            JKUBSAspectLogError(@"Failed to allocate memory for block invocation.");
+            MDAspectLogError(@"Failed to allocate memory for block invocation.");
 			return NO;
 		}
         
@@ -835,21 +835,21 @@ static void aspect_deregisterTrackedSelector(id self, SEL selector) {
 @end
 
 ///////////////////////////////////////////////////////////////////////////////////////////
-#pragma mark - JKUBSAspectsContainer
+#pragma mark - MDAspectsContainer
 
-@implementation JKUBSAspectsContainer
+@implementation MDAspectsContainer
 
 - (BOOL)hasAspects {
     return self.beforeAspects.count > 0 || self.insteadAspects.count > 0 || self.afterAspects.count > 0;
 }
 
-- (void)addAspect:(JKUBSAspectIdentifier *)aspect withOptions:(JKUBSAspectOptions)options {
+- (void)addAspect:(MDAspectIdentifier *)aspect withOptions:(MDAspectOptions)options {
     NSParameterAssert(aspect);
-    NSUInteger position = options&JKUBSAspectPositionFilter;
+    NSUInteger position = options&MDAspectPositionFilter;
     switch (position) {
-        case JKUBSAspectPositionBefore:  self.beforeAspects  = [(self.beforeAspects ?:@[]) arrayByAddingObject:aspect]; break;
-        case JKUBSAspectPositionInstead: self.insteadAspects = [(self.insteadAspects?:@[]) arrayByAddingObject:aspect]; break;
-        case JKUBSAspectPositionAfter:   self.afterAspects   = [(self.afterAspects  ?:@[]) arrayByAddingObject:aspect]; break;
+        case MDAspectPositionBefore:  self.beforeAspects  = [(self.beforeAspects ?:@[]) arrayByAddingObject:aspect]; break;
+        case MDAspectPositionInstead: self.insteadAspects = [(self.insteadAspects?:@[]) arrayByAddingObject:aspect]; break;
+        case MDAspectPositionAfter:   self.afterAspects   = [(self.afterAspects  ?:@[]) arrayByAddingObject:aspect]; break;
     }
 }
 
@@ -876,9 +876,9 @@ static void aspect_deregisterTrackedSelector(id self, SEL selector) {
 @end
 
 ///////////////////////////////////////////////////////////////////////////////////////////
-#pragma mark - JKUBSAspectInfo
+#pragma mark - MDAspectInfo
 
-@implementation JKUBSAspectInfo
+@implementation MDAspectInfo
 
 @synthesize arguments = _arguments;
 

@@ -15,16 +15,16 @@
                                         @"TrackEvents":@[
                                                 @{//实例方法
                                                     @"EventSelectorName":@"instanceMethod",
-                                                    @"block":^(id<JKUBSAspectInfo>aspectInfo){
+                                                    @"block":^(id<MDAspectInfo>aspectInfo){
                                                         // 获取方法的参数
-                                                        NSLog(@"跳转了");
+                                                        NSLog(@"跳转");
                                                     },
                                                 },
                                                 @{//类方法
                                                     @"EventSelectorName":@"+hookClassMethod",
-                                                    @"block":^(id<JKUBSAspectInfo>aspectInfo){
+                                                    @"block":^(id<MDAspectInfo>aspectInfo){
                                                         // 获取方法的参数
-                                                        NSLog(@"hook到了MDViewController的类方法");
+                                                        NSLog(@"到处可以hook到我");
                                                     },
                                                 },
                                             ]

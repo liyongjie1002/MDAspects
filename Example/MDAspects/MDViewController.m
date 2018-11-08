@@ -6,8 +6,7 @@
 //  Copyright (c) 2018 iyongjie@yeah.net. All rights reserved.
 //
 
-#import "MDViewController.h"
-#import "JKUBSAspects.h"
+#import "MDViewController.h"  
 #import "MDSecViewController.h"
 
 @interface MDViewController ()

@@ -15,16 +15,16 @@
                                         @"TrackEvents":@[
                                                 @{//实例方法
                                                     @"EventSelectorName":@"instanceMethod",
-                                                    @"block":^(id<JKUBSAspectInfo>aspectInfo){
+                                                    @"block":^(id<MDAspectInfo>aspectInfo){
                                                         // 获取方法的参数
-                                                        NSLog(@"让你点");
+                                                        NSLog(@"实例方法");
                                                     },
                                                 },
                                                 @{//类方法
                                                     @"EventSelectorName":@"+testfun",
-                                                    @"block":^(id<JKUBSAspectInfo>aspectInfo){
+                                                    @"block":^(id<MDAspectInfo>aspectInfo){
                                                         // 获取方法的参数
-                                                        NSLog(@"就点");
+                                                        NSLog(@"类方法");
                                                     },
                                                 },
                                             ]
