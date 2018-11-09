@@ -21,12 +21,11 @@ Pod::Spec.new do |s|
                         对著名第三方库Aspects的扩展，添加了对类方法hook的支持
                        DESC
 
-  s.homepage         = 'https://github.com/iyongjie@yeah.net/MDAspects'
+  s.homepage         = 'https://github.com/Iyongjie/MDAspects'
   
   s.license          = { :type => 'MIT', :file => 'LICENSE' }
-  s.author           = { 'iyongjie@yeah.net' => 'yj.li@muheda.com' }
-  s.source           = { :git => 'https://github.com/iyongjie@yeah.net/MDAspects.git', :tag => s.version.to_s }
-  # s.social_media_url = 'https://twitter.com/<TWITTER_USERNAME>'
+  s.author           = { '李永杰' => 'iyongjie@yeah.net' }
+  s.source           = { :git => 'https://github.com/Iyongjie/MDAspects.git', :tag => s.version.to_s }
 
   s.ios.deployment_target = '8.0'
 

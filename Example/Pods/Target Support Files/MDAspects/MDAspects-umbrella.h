@@ -10,7 +10,7 @@
 #endif
 #endif
 
-#import "JKUBSAspects.h"
+#import "MDAspects.h"
 
 FOUNDATION_EXPORT double MDAspectsVersionNumber;
 FOUNDATION_EXPORT const unsigned char MDAspectsVersionString[];
