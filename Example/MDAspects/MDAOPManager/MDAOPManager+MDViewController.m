@@ -14,6 +14,7 @@
                                 @"MDViewController":@{
                                         @"TrackEvents":@[
                                                 @{//实例方法
+                                                    @"moment":@"before",
                                                     @"EventSelectorName":@"instanceMethod",
                                                     @"block":^(id<MDAspectInfo>aspectInfo){
                                                         // 获取方法的参数
@@ -21,6 +22,7 @@
                                                     },
                                                 },
                                                 @{//类方法
+                                                    @"moment":@"instead",
                                                     @"EventSelectorName":@"+hookClassMethod",
                                                     @"block":^(id<MDAspectInfo>aspectInfo){
                                                         // 获取方法的参数

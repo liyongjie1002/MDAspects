@@ -33,29 +33,36 @@ typedef void (^AspectEventBlock)(id<MDAspectInfo> aspectInfo);
                 
                 AspectEventBlock buttonBlock = event[@"block"];
                 NSString *method = event[@"EventSelectorName"];
+                NSString *moment = event[@"moment"];
+                
+                MDAspectOptions option = MDAspectPositionAfter;
+                if ([moment isEqualToString:@"before"]) {
+                    option = MDAspectPositionBefore;
+                }else if ([moment isEqualToString:@"instead"]){
+                    option = MDAspectPositionInstead;
+                }
+                
                 SEL selector = NSSelectorFromString(method);
 
                 if ([method hasPrefix:@"+"]) {//hook类方法
                     method = [method substringFromIndex:1];
                     selector = NSSelectorFromString(method);
 
-                    [clazz aspect_hookClassSelector:selector withOptions:MDAspectPositionAfter usingBlock:^(id<MDAspectInfo> aspectInfo) {
+                    [clazz aspect_hookClassSelector:selector withOptions:option usingBlock:^(id<MDAspectInfo> aspectInfo) {
                         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
                             buttonBlock(aspectInfo);
                         });
                     } error:NULL];
                 }else{//hook实例方法
                     
-                    [clazz aspect_hookSelector:selector withOptions:MDAspectPositionAfter usingBlock:^(id<MDAspectInfo> aspectInfo) {
+                    [clazz aspect_hookSelector:selector withOptions:option usingBlock:^(id<MDAspectInfo> aspectInfo) {
                         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
                             buttonBlock(aspectInfo);
                         });
                     } error:NULL];
                 }
-
             }
         }
     }
 }
-
 @end

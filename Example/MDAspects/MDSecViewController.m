@@ -36,10 +36,27 @@
 }
 -(void)instanceMethod{
     [MDSecViewController testfun];
+    //获取方法列表
+    unsigned int methodCount;
+    Method *methods = class_copyMethodList([self class], &methodCount);
+    for (int i = 0; i < methodCount; i ++) {
+        Method m = methods[i];
+        NSLog(@"SEL：%d-----%s", i, sel_getName(method_getName(m)));
+    }
+    free(methods);
 }
 +(void)testfun{
     NSLog(@"类方法执行了");
-    
+    //获取类方法列表
+    unsigned int methodCount;
+    //获取元类
+    Class obj = object_getClass([self class]);
+    Method *methods = class_copyMethodList(obj, &methodCount);
+    for (int i = 0; i < methodCount; i ++) {
+        Method m = methods[i];
+        NSLog(@"SEL：%d-----%s", i, sel_getName(method_getName(m)));
+    }
+    free(methods);
 }
 
 -(void)clickAction{

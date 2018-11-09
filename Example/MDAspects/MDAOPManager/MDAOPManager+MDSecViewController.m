@@ -14,6 +14,7 @@
                                 @"MDSecViewController":@{
                                         @"TrackEvents":@[
                                                 @{//实例方法
+                                                    @"moment":@"after",
                                                     @"EventSelectorName":@"instanceMethod",
                                                     @"block":^(id<MDAspectInfo>aspectInfo){
                                                         // 获取方法的参数
@@ -21,6 +22,7 @@
                                                     },
                                                 },
                                                 @{//类方法
+                                                    @"moment":@"after",
                                                     @"EventSelectorName":@"+testfun",
                                                     @"block":^(id<MDAspectInfo>aspectInfo){
                                                         // 获取方法的参数
