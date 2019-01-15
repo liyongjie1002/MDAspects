@@ -10,7 +10,6 @@
 #import "MDAOPManager+MDViewController.h"
 #import "MDAOPManager+MDSecViewController.h"
 
-
 typedef void (^AspectEventBlock)(id<MDAspectInfo> aspectInfo);
 
 @implementation MDAOPManager

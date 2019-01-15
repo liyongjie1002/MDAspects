@@ -31,8 +31,21 @@
     [btn1 setFrame:CGRectMake(100, 200, 240, 30)];
     [btn1 addTarget:self action:@selector(clickAction) forControlEvents:UIControlEventTouchUpInside];
     [self.view addSubview:btn1];
- 
-
+    
+    UIButton *btn2 = [UIButton buttonWithType:UIButtonTypeCustom];
+    [btn2 setTitle:@"带参数的实例方法" forState:UIControlStateNormal];
+    [btn2 setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+    [btn2 setFrame:CGRectMake(100, 300, 240, 30)];
+    [btn2 addTarget:self action:@selector(clickInstance) forControlEvents:UIControlEventTouchUpInside];
+    [self.view addSubview:btn2];
+    
+    UIButton *btn3 = [UIButton buttonWithType:UIButtonTypeCustom];
+    [btn3 setTitle:@"带参数的类方法" forState:UIControlStateNormal];
+    [btn3 setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+    [btn3 setFrame:CGRectMake(100, 400, 240, 30)];
+    [btn3 addTarget:self action:@selector(clickClass) forControlEvents:UIControlEventTouchUpInside];
+    [self.view addSubview:btn3];
+    
 }
 -(void)instanceMethod{
     [MDSecViewController testfun];
@@ -42,6 +55,7 @@
     for (int i = 0; i < methodCount; i ++) {
         Method m = methods[i];
         NSLog(@"SEL：%d-----%s", i, sel_getName(method_getName(m)));
+        
     }
     free(methods);
 }
@@ -61,5 +75,19 @@
 
 -(void)clickAction{
     [MDViewController hookClassMethod];
-} 
+}
+#pragma mark - 带参数的实例方法
+-(void)clickInstance{
+    [self clickInstanceWithArguments:10 name:@"夏侯惇"];
+}
+-(void)clickInstanceWithArguments:(NSInteger )age name:(NSString *)name {
+    NSLog(@"%@ is %ld 岁了",name,age);
+}
+#pragma mark - 带参数的类方法
+-(void)clickClass {
+    [MDSecViewController clickClassMethodWithArgument:@"元歌" address:@"中国"];
+}
++(void)clickClassMethodWithArgument:(NSString *)name address:(NSString *)address {
+    NSLog(@"%@在%@上班",name,address);
+}
 @end

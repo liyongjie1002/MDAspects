@@ -29,6 +29,22 @@
                                                         NSLog(@"类方法");
                                                     },
                                                 },
+                                                @{//实例方法
+                                                    @"moment":@"after",
+                                                    @"EventSelectorName":@"clickInstanceWithArguments:name:",
+                                                    @"block":^(id<MDAspectInfo>aspectInfo){
+                                                        // 获取方法的参数
+                                                        NSLog(@"%@",aspectInfo.arguments);
+                                                    },
+                                                },
+                                                @{//类方法
+                                                    @"moment":@"after",
+                                                    @"EventSelectorName":@"+clickClassMethodWithArgument:address:",
+                                                    @"block":^(id<MDAspectInfo>aspectInfo){
+                                                        // 获取方法的参数
+                                                        NSLog(@"%@",aspectInfo.arguments);
+                                                    },
+                                                },
                                             ]
                                         },
                                 };
