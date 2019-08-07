@@ -78,10 +78,10 @@
 }
 #pragma mark - 带参数的实例方法
 -(void)clickInstance{
-    [self clickInstanceWithArguments:10 name:@"夏侯惇"];
+    [self clickInstanceWithArguments:10 name:@"小明"];
 }
 -(void)clickInstanceWithArguments:(NSInteger )age name:(NSString *)name {
-    NSLog(@"%@ is %ld 岁了",name,age);
+    NSLog(@"%@ 今年 %ld 岁了",name,age);
 }
 #pragma mark - 带参数的类方法
 -(void)clickClass {
