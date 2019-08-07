@@ -6,7 +6,7 @@
 [![Platform](https://img.shields.io/cocoapods/p/MDAspects.svg?style=flat)](https://cocoapods.org/pods/MDAspects)
 
 ## 声明
-依赖著名第三方库[Aspects](https://github.com/steipete/Aspects),参考[JKUBAspects](https://github.com/xindizhiyin2014/JKUBSAspects)，值得花时间研究下代码
+依赖著名第三方库[Aspects](https://github.com/steipete/Aspects),参考[JKUBAspects](https://github.com/xindizhiyin2014/JKUBSAspects)，在原有基础上添加了对类方法的支持，互相学习交流
 ## Example
 
 To run the example project, clone the repo, and run `pod install` from the Example directory first.

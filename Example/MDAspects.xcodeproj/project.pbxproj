@@ -275,6 +275,9 @@
 				LastUpgradeCheck = 0720;
 				ORGANIZATIONNAME = "iyongjie@yeah.net";
 				TargetAttributes = {
+					6003F589195388D20070C39A = {
+						DevelopmentTeam = KNF25R344F;
+					};
 					6003F5AD195388D20070C39A = {
 						TestTargetID = 6003F589195388D20070C39A;
 					};
@@ -285,6 +288,7 @@
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
+				English,
 				en,
 				Base,
 			);
@@ -517,6 +521,7 @@
 			baseConfigurationReference = 52AAA88A46B31F235451E5EF /* Pods-MDAspects_Example.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				DEVELOPMENT_TEAM = KNF25R344F;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "MDAspects/MDAspects-Prefix.pch";
 				INFOPLIST_FILE = "MDAspects/MDAspects-Info.plist";
@@ -537,6 +542,7 @@
 			baseConfigurationReference = 3915C6DEE621B97B01292BFC /* Pods-MDAspects_Example.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				DEVELOPMENT_TEAM = KNF25R344F;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "MDAspects/MDAspects-Prefix.pch";
 				INFOPLIST_FILE = "MDAspects/MDAspects-Info.plist";
