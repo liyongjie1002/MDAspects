@@ -9,22 +9,24 @@
 #import "MDAOPManager+MDViewController.h"
 
 @implementation MDAOPManager (MDViewController)
+
 +(NSDictionary *)AOP_MDViewControllerConfigDic{
+    
     NSDictionary *configDic = @{
-                                @"MDViewController":@{
+                                @"MDViewController":@{//hook那个类名
                                         @"TrackEvents":@[
                                                 @{//实例方法
-                                                    @"moment":@"before",
-                                                    @"EventSelectorName":@"instanceMethod",
-                                                    @"block":^(id<MDAspectInfo>aspectInfo){
+                                                    @"moment":@"before",//hook之前调用
+                                                    @"EventSelectorName":@"instanceMethod",//实例方法名
+                                                    @"block":^(id<MDAspectInfo>aspectInfo){//回调处理
                                                         // 获取方法的参数
                                                         NSLog(@"跳转");
                                                     },
                                                 },
                                                 @{//类方法
-                                                    @"moment":@"instead",
-                                                    @"EventSelectorName":@"+hookClassMethod",
-                                                    @"block":^(id<MDAspectInfo>aspectInfo){
+                                                    @"moment":@"instead",//替换原方法
+                                                    @"EventSelectorName":@"+hookClassMethod",//类方法名
+                                                    @"block":^(id<MDAspectInfo>aspectInfo){//回调处理
                                                         // 获取方法的参数
                                                         NSLog(@"到处可以hook到我");
                                                     },

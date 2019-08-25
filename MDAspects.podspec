@@ -1,7 +1,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'MDAspects'
-  s.version          = '1.0.1'
+  s.version          = '1.0.2'
   s.summary          = 'AOP 提高开发效率'
   s.description      = <<-DESC
                         对著名第三方库Aspects的扩展，添加了对类方法hook的支持

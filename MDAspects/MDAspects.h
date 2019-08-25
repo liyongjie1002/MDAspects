@@ -8,9 +8,9 @@
 #import <Foundation/Foundation.h>
 
 typedef NS_OPTIONS(NSUInteger, MDAspectOptions) {
-    MDAspectPositionAfter   = 0,            /// Called after the original implementation (default)
-    MDAspectPositionInstead = 1,            /// Will replace the original implementation.
-    MDAspectPositionBefore  = 2,            /// Called before the original implementation.
+    MDAspectPositionAfter   = 0,            /// 默认，当原方法执行完调用
+    MDAspectPositionInstead = 1,            /// 替换原方法
+    MDAspectPositionBefore  = 2,            /// 原方法执行前调用
     
     MDAspectOptionAutomaticRemoval = 1 << 3 /// Will remove the hook after the first execution.
 };

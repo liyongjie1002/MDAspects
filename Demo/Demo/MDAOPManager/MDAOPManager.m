@@ -10,29 +10,31 @@
 #import "MDAOPManager+MDViewController.h"
 #import "MDAOPManager+MDSecViewController.h"
 
+// hook到方法回调
 typedef void (^AspectEventBlock)(id<MDAspectInfo> aspectInfo);
 
 @implementation MDAOPManager
 
-+(void)load{
++(void)load{ // 加载配置文件
     NSMutableDictionary *mutableDic = [NSMutableDictionary dictionary];
     [mutableDic addEntriesFromDictionary:[MDAOPManager AOP_MDViewControllerConfigDic]];
     [mutableDic addEntriesFromDictionary:[MDAOPManager AOP_MDSecViewControllerConfigDic]];
     [self configAOPWithDic:mutableDic];
     
 }
+
 +(void)configAOPWithDic:(NSDictionary *)configDic{
-    
+    // 解析配置文件
     for (NSString *className in configDic) {
-        Class clazz = NSClassFromString(className);
-        NSDictionary *config = configDic[className];
-        NSArray *trackArr = config[@"TrackEvents"];
+        Class clazz = NSClassFromString(className);//拿到类名
+        NSDictionary *config = configDic[className];//配置信息
+        NSArray *trackArr = config[@"TrackEvents"];//方法数组
         if (trackArr) {
             for (NSDictionary *event in trackArr) {
                 
-                AspectEventBlock buttonBlock = event[@"block"];
-                NSString *method = event[@"EventSelectorName"];
-                NSString *moment = event[@"moment"];
+                AspectEventBlock buttonBlock = event[@"block"];//回调
+                NSString *method = event[@"EventSelectorName"];//方法名
+                NSString *moment = event[@"moment"];//hook时机
                 
                 MDAspectOptions option = MDAspectPositionAfter;
                 if ([moment isEqualToString:@"before"]) {
